@@ -3,7 +3,7 @@
 
 // Reference rules:
 // - At any given time, you can have either but not both of the following:
-// One mutable reference or any number of immutable references
+//   One mutable reference or any number of immutable references
 // - References must always be valid (no lieutenant dangle!)
 
 // String literals are &str to pointing to its start in the binary (a slice)
