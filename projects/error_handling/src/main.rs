@@ -19,6 +19,8 @@ fn main() {
     //non_recoverable_with_shortcut();
     recoverable_with_propagation();
     recoverable_with_propagation_shortcut();
+    recoverable_with_propagation_shortcut2();
+    recoverable_with_propagation_shortcut3();
 }
 
 fn non_recoverable_example() {
@@ -85,6 +87,12 @@ fn read_username_2() -> Result<String, io::Error> {
     Ok(s)
 }
 
+fn read_username3() -> Result<String, io::Error> {
+    let mut s = String::new();
+    File::open("hello.txt")?.read_to_string(&mut s)?; //? error chaining inline
+    Ok(s)
+}
+
 fn recoverable_with_propagation_shortcut() {
     let u_or_err = read_username_2();
     match u_or_err {
@@ -92,3 +100,34 @@ fn recoverable_with_propagation_shortcut() {
         Err(e) => println!("Error: {}", e),
     }
 }
+
+fn recoverable_with_propagation_shortcut2() -> Result<String, io::Error> {
+    Ok(read_username_2()?)
+}
+
+fn recoverable_with_propagation_shortcut3() -> Result<String, io::Error> {
+    let s = read_username_2()?;
+    Ok(s)
+}
+
+// Summary, .expect and .unwrap are habdy to prototype and scaffold
+// unwrap and expect are perfect for unittests
+
+// It's perfectly acceptable to call expect and unwrap when it's guaranteed
+// to not err:
+// use std::net::IpAddr;
+// let home: IpAddr = "127.0.0.1".parse().unwrap();
+
+// It's advisable to panic when you know you can no longer guarantee something,
+// assume something, a contract has been broken, or an invariant has been
+// invalidated.
+// Like:
+// --Invalid values
+// --Contradictory values,
+// --Missing values
+// Plus one or more of the following states:
+// - The bad state is not something that's expected to happen occasionally
+// - Your code after this point needs to rely on not being in this state
+// - There's not a good way to encode this information in the types you use
+
+
