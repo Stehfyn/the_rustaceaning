@@ -21,6 +21,7 @@ fn main() {
     recoverable_with_propagation_shortcut();
     recoverable_with_propagation_shortcut2();
     recoverable_with_propagation_shortcut3();
+    custom_types_for_validation();
 }
 
 fn non_recoverable_example() {
@@ -110,6 +111,31 @@ fn recoverable_with_propagation_shortcut3() -> Result<String, io::Error> {
     Ok(s)
 }
 
+pub struct Guess {
+    value: u32,
+}
+
+impl Guess {
+    pub fn new(value: u32) -> Guess {
+        if value < 1 || value > 100 {
+            panic!("Guess needs to be between 1 and 100.");
+        } else {
+            Guess { value }
+        }
+    }
+
+    pub fn value(&self) -> u32 {
+        self.value
+    }
+}
+
+fn valid_guess(guess: &Guess) {}
+
+fn custom_types_for_validation() {
+    let guess = Guess::new(100);
+    valid_guess(&guess);
+}
+
 // Summary, .expect and .unwrap are habdy to prototype and scaffold
 // unwrap and expect are perfect for unittests
 
@@ -130,4 +156,11 @@ fn recoverable_with_propagation_shortcut3() -> Result<String, io::Error> {
 // - Your code after this point needs to rely on not being in this state
 // - There's not a good way to encode this information in the types you use
 
-
+// Attack vectors:
+// - Attempting to operate on invalid data exposes vulnerabilities
+// - Functions have contracts. Behavior is only guaranteed if the inputs meet particular requirements.
+// - Panicking when the contract is violated makes sense because contract violation indicates a
+// caller side bug, as opposed to one that is a potentiality to despite how well formed the code is.
+// It's also not the kind of error you'd want the client to handle to begin with.
+// Type checking and validation is annoying for use throughout a library. However using a particular
+// type implicitly guarantees your value is valid insofar as a well-formed type.
